@@ -9,46 +9,74 @@
     <LinearLayout
         android:id="@+id/ll_button"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:gravity="center"
         android:orientation="horizontal"
+
         >
+
         <Button
             android:id="@+id/bt_on"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:layout_weight="1"
-            android:text="打开蓝牙"
             android:onClick="onClick"
-            />
+            android:padding="1dp"
+            android:text="打开设备蓝牙" />
+
         <Button
-            android:id="@+id/bt_discover"
+            android:id="@+id/bt_discovered"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:layout_weight="1"
-            android:text="打开发现"
             android:onClick="onClick"
-            />
+            android:padding="1dp"
+            android:text="本机蓝牙可被发现" />
+
         <Button
             android:id="@+id/bt_finddevice"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:layout_weight="1"
-            android:text="搜索设备"
             android:onClick="onClick"
-            />
+            android:padding="1dp"
+            android:text="已配对设备列表" />
+
         <Button
             android:id="@+id/bt_close"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:layout_weight="1"
-            android:text="关闭蓝牙"
             android:onClick="onClick"
-            />
+            android:padding="1dp"
+            android:text="关闭蓝牙" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_button2"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/ll_button"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/bt_discover"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            android:text="搜索附近蓝牙" />
+
+    </LinearLayout>
+
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/ll_button"
-        />
+        android:layout_below="@+id/ll_button2" />
 </RelativeLayout>
