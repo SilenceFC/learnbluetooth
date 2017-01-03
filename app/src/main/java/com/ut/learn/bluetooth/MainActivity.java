@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -18,8 +19,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private Button bt_on,bt_discovered,bt_finddevice,bt_close;
     private Button bt_discover;
     private ListView list;
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         createAndRegisterBroadcast();
+        list.setOnItemClickListener(this);
     }
 
     /**
@@ -51,6 +54,10 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this,"Bluetooth搜索到设备："+device.getName(),Toast.LENGTH_LONG).show();
                     bt_discover.setText("搜索附近蓝牙");
                     isFound = false;
+                }else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
+                    Toast.makeText(MainActivity.this,"Bluetooth搜索结束",Toast.LENGTH_LONG).show();
+                    bt_discover.setText("搜索附近蓝牙");
+                    isFound = false;
                 }
                 if (adapter!=null){
                     adapter.notifyDataSetChanged();
@@ -61,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(mReceiver,filter);
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(mReceiver,filter);
     }
 
@@ -75,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         list_name = new ArrayList<>();
 
         ba = BluetoothAdapter.getDefaultAdapter();
+
     }
 
     public void onClick(View v) {
@@ -130,5 +140,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String str = list_name.get(position);
+        if(str!=null && str.contains("发现的设备")){
+            Intent intent = new Intent(MainActivity.this,ChatActivity.class);
+            intent.putExtra("Device",str.substring(6));
+            startActivity(intent);
+        }
     }
 }
