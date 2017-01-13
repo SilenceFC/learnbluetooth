@@ -1,4 +1,4 @@
-package com.ut.learn.bluetooth;
+package com.ut.learn.bluetooth.activity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -16,10 +16,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.ut.learn.bluetooth.R;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private Button bt_on,bt_discovered,bt_finddevice,bt_close;
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private List<String> list_name;
     private ArrayAdapter adapter;
     private boolean isFound;
+    private BroadcastReceiver mReceiver;
+    private boolean isRegister = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +47,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * 创建并注册广播接受者
      */
     private void createAndRegisterBroadcast() {
-        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if(BluetoothDevice.ACTION_FOUND.equals(action)){
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    list_name.add("发现的设备："+device.getName());
+                    list_name.add("发现的设备："+device.getName()+"\n"+device.getAddress());
                     Toast.makeText(MainActivity.this,"Bluetooth搜索到设备："+device.getName(),Toast.LENGTH_LONG).show();
                     bt_discover.setText("搜索附近蓝牙");
                     isFound = false;
@@ -66,11 +69,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     list.setAdapter(adapter);
                 }
             }
+
         };
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver,filter);
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(mReceiver,filter);
+        isRegister = true;
     }
 
     private void initView() {
@@ -105,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case R.id.bt_finddevice:
                devices =ba.getBondedDevices();//获取已经配对的蓝牙设备
                 for (BluetoothDevice device:devices) {
-                    list_name.add("已配对设备："+device.getName());
+                    list_name.add("已配对设备："+device.getName()+"\n"+device.getAddress());
                     Log.e("finddevice", "name: "+device.getName() );
                 }
                 if (adapter == null){
@@ -140,15 +145,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(ba!=null){
+            ba.cancelDiscovery();
+        }
+        if(isRegister){
+            this.unregisterReceiver(mReceiver);
+        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String str = list_name.get(position);
-        if(str!=null && str.contains("发现的设备")){
+        if(str!=null ){
+            ba.cancelDiscovery();
             Intent intent = new Intent(MainActivity.this,ChatActivity.class);
-            intent.putExtra("Device",str.substring(6));
-            startActivity(intent);
+            intent.putExtra("Device",str.substring(str.length()-17));
+            intent.putExtra("DeviceName",str.substring(6,str.length()-17));
+
+            setResult(RESULT_OK,intent);
+            finish();
         }
     }
 }
